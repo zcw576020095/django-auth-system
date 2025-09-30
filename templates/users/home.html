@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}主页{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">欢迎, {{ user.username }}!</h1>
+    <p class="lead">您已成功登录到用户认证系统。</p>
+    <hr class="my-4">
+    <p>这是一个简单的Django用户认证系统，包含了用户注册和登录功能。</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'logout' %}" role="button">退出登录</a>
+</div>
+{% endblock %}

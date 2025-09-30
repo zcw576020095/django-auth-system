@@ -1,0 +1,91 @@
+<!-- 登录页面内容片段 -->
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-sign-in-alt me-2"></i>用户登录
+                </h4>
+            </div>
+                <div class="card-body p-4">
+                    <!-- 消息显示区域 -->
+                    <div id="login-messages"></div>
+                    
+                    <form method="post" 
+                          hx-post="{% url 'login' %}" 
+                          hx-target="#main-content" 
+                          hx-swap="innerHTML" 
+                          hx-push-url="true"
+                          hx-on::before-request="setFormSubmitting(this, true)"
+                          hx-on::after-request="setFormSubmitting(this, false)"
+                          hx-on::response-error="setFormSubmitting(this, false); showMessage('登录失败，请重试', 'danger')">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-1"></i>用户名
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="username" 
+                                       name="username" 
+                                       placeholder="请输入用户名"
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>密码
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password" 
+                                       placeholder="请输入密码"
+                                       required>
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        onclick="togglePassword('password')">
+                                    <i class="fas fa-eye" id="password-toggle"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="btn-text">
+                                    <i class="fas fa-sign-in-alt me-2"></i>登录
+                                </span>
+                                <span class="btn-spinner d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    登录中...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">还没有账号？ 
+                            <a href="{% url 'register' %}" 
+                               class="text-decoration-none"
+                               hx-get="{% url 'register' %}" 
+                               hx-target="#main-content" 
+                               hx-swap="innerHTML" 
+                               hx-push-url="true">
+                                立即注册
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>

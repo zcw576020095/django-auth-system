@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}用户认证系统{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --primary-dark: #3a56b0;
+            --secondary-color: #f8f9fc;
+            --accent-color: #36b9cc;
+            --text-color: #5a5c69;
+            --dark-color: #2d3748;
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: 'Noto Sans SC', sans-serif;
+            color: var(--text-color);
+            background-color: #f8f9fc;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1 0 auto;
+            padding: 0;
+            background-color: #f8f9fc;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            margin: 0 0.3rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            border-radius: 5px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .form-control {
+            border-radius: 6px;
+            padding: 0.7rem 1rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .input-group-focus {
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.15);
+            border-radius: 6px;
+        }
+        
+        .input-group-text {
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            border-color: #e2e8f0;
+            color: #6c757d;
+            width: 45px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .input-group .form-control {
+            border-left: none;
+            height: 38px;
+            line-height: 1.5;
+            padding: 6px 12px;
+        }
+        
+        .input-group .btn {
+            border-left: none;
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            height: 38px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary-color);
+            background-color: rgba(78, 115, 223, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .input-group:focus-within .form-control {
+            border-color: var(--primary-color);
+            box-shadow: none;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            padding: 1.5rem 0;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+        
+        /* 添加页面内容容器 */
+        .content-wrapper {
+            background-color: #f8f9fc;
+            border-radius: 0;
+            padding: 2rem;
+            box-shadow: none;
+            min-height: calc(100vh - 140px);
+        }
+        
+        /* 自定义动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        /* HTMX 过渡效果 */
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+        
+        /* 表单提交状态 */
+        .form-submitting {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        /* 加载动画 */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 消息提示优化 */
+        .message-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+        }
+        
+        .alert-floating {
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: none;
+            border-radius: 8px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            main {
+                padding: 1rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HTMX 加载指示器 -->
+    <div class="htmx-indicator position-fixed top-50 start-50 translate-middle" style="z-index: 9999;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">加载中...</span>
+        </div>
+    </div>
+    
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <i class="fas fa-lock me-2"></i>用户认证系统
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'home' %}" 
+                                   hx-get="{% url 'home' %}" 
+                                   hx-target="#main-content"
+                                   hx-swap="innerHTML" 
+                                   hx-push-url="true">
+                                    <i class="fas fa-home me-1"></i>主页
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}"
+                                   onclick="return confirm('确定要退出登录吗？');">
+                                    <i class="fas fa-sign-out-alt me-1"></i>退出
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}" 
+                                   hx-get="{% url 'login' %}" 
+                                   hx-target="#main-content"
+                                   hx-swap="innerHTML" 
+                                   hx-push-url="true"
+                                   hx-indicator=".htmx-indicator"
+                                   hx-on::before-request="this.style.pointerEvents='none'"
+                                   hx-on::after-request="this.style.pointerEvents='auto'">
+                                    <i class="fas fa-sign-in-alt me-1"></i>登录
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}" 
+                                   hx-get="{% url 'register' %}" 
+                                   hx-target="#main-content"
+                                   hx-swap="innerHTML" 
+                                   hx-push-url="true"
+                                   hx-indicator=".htmx-indicator"
+                                   hx-on::before-request="this.style.pointerEvents='none'"
+                                   hx-on::after-request="this.style.pointerEvents='auto'">
+                                    <i class="fas fa-user-plus me-1"></i>注册
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container-fluid fade-in">
+            <!-- 浮动消息容器 -->
+            <div id="message-container" class="message-container"></div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div id="main-content" class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-white text-center">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-shield-alt me-2"></i>用户认证系统 &copy; {% now "Y" %}
+                <span class="mx-2">|</span>
+                <span>安全可靠的身份验证服务</span>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // HTMX 全局配置
+        document.addEventListener('DOMContentLoaded', function() {
+            // 配置 HTMX 默认设置
+            htmx.config.defaultSwapStyle = 'outerHTML';
+            htmx.config.defaultSwapDelay = 100;
+            htmx.config.defaultSettleDelay = 100;
+            
+            // 全局错误处理
+            document.body.addEventListener('htmx:responseError', function(evt) {
+                showMessage('网络错误，请稍后重试', 'danger');
+            });
+            
+            // 全局成功处理
+            document.body.addEventListener('htmx:afterSwap', function(evt) {
+                // 重新初始化 Bootstrap 组件
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            });
+            
+            // 监听自定义消息事件
+            document.body.addEventListener('showMessage', function(evt) {
+                console.log('收到showMessage事件:', evt);
+                const data = evt.detail;
+                if (data && data.message) {
+                    showMessage(data.message, data.type || 'success');
+                } else {
+                    // 兼容旧格式
+                    showMessage('操作成功！', 'success');
+                }
+            });
+            
+            // 监听HTMX触发器事件
+            document.body.addEventListener('htmx:trigger', function(evt) {
+                console.log('HTMX触发器事件:', evt.detail);
+                if (evt.detail.trigger === 'showMessage') {
+                    const data = evt.detail.data || {};
+                    showMessage(data.message || '操作成功！', data.type || 'success');
+                }
+            });
+        });
+        
+        // 显示浮动消息
+        function showMessage(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('message-container');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-floating alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-info-circle me-2"></i>${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            container.appendChild(alertDiv);
+            
+            // 自动移除消息
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, duration);
+        }
+        
+        // 表单提交状态管理
+        function setFormSubmitting(form, submitting) {
+            console.log('设置表单提交状态:', submitting, form);
+            if (submitting) {
+                form.classList.add('form-submitting');
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.setAttribute('data-original-text', originalText);
+                    submitBtn.innerHTML = '<span class="spinner me-2"></span>处理中...';
+                }
+            } else {
+                form.classList.remove('form-submitting');
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    const originalText = submitBtn.getAttribute('data-original-text');
+                    if (originalText) {
+                        submitBtn.innerHTML = originalText;
+                    } else {
+                        // 备用恢复方案
+                        const btnText = submitBtn.querySelector('.btn-text');
+                        const btnSpinner = submitBtn.querySelector('.btn-spinner');
+                        if (btnText && btnSpinner) {
+                            btnText.classList.remove('d-none');
+                            btnSpinner.classList.add('d-none');
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 全局HTMX事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 监听所有HTMX请求完成事件
+            document.body.addEventListener('htmx:afterRequest', function(evt) {
+                // 注释掉调试日志，避免控制台输出
+                // console.log('HTMX请求完成:', evt.detail);
+                // 查找并恢复所有表单的提交状态
+                const forms = document.querySelectorAll('form.form-submitting');
+                forms.forEach(form => {
+                    setFormSubmitting(form, false);
+                });
+            });
+            
+            // 监听HTMX错误事件
+            document.body.addEventListener('htmx:responseError', function(evt) {
+                // 注释掉调试日志，避免控制台输出
+                // console.log('HTMX响应错误:', evt.detail);
+                // 查找并恢复所有表单的提交状态
+                const forms = document.querySelectorAll('form.form-submitting');
+                forms.forEach(form => {
+                    setFormSubmitting(form, false);
+                });
+            });
+            
+            // 监听HTMX发送错误事件
+            document.body.addEventListener('htmx:sendError', function(evt) {
+                // 注释掉调试日志，避免控制台输出
+                // console.log('HTMX发送错误:', evt.detail);
+                // 查找并恢复所有表单的提交状态
+                const forms = document.querySelectorAll('form.form-submitting');
+                forms.forEach(form => {
+                    setFormSubmitting(form, false);
+                });
+            });
+        });
+        
+        // 密码显示/隐藏切换功能
+        function togglePassword(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const toggleIcon = document.getElementById(fieldId + '-toggle');
+            
+            if (passwordField && toggleIcon) {
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            }
+        }
+        
+        // HTMX调试日志
+        document.addEventListener('DOMContentLoaded', function() {
+            // 验证main-content元素是否存在
+            const mainContent = document.querySelector('#main-content');
+            // 注释掉调试日志，避免控制台输出
+            // console.log('页面加载完成，#main-content元素:', mainContent);
+            
+            // 监听HTMX事件
+            document.body.addEventListener('htmx:beforeRequest', function(evt) {
+                // 注释掉调试日志，避免控制台输出
+                // console.log('HTMX请求开始:', evt.detail);
+                
+                // 确保target是有效的选择器字符串
+                let targetSelector = '#main-content';
+                if (evt.detail.target && typeof evt.detail.target === 'string') {
+                    targetSelector = evt.detail.target;
+                }
+                const target = document.querySelector(targetSelector);
+                // console.log('请求时目标元素:', target);
+            });
+            
+            document.body.addEventListener('htmx:afterRequest', function(evt) {
+                // 注释掉调试日志，避免控制台输出
+                // console.log('HTMX请求完成:', evt.detail);
+            });
+            
+            document.body.addEventListener('htmx:targetError', function(evt) {
+                // 注释掉错误日志，避免控制台显示错误
+                // console.error('HTMX目标错误:', evt.detail);
+                
+                // 简化目标处理逻辑
+                const mainContent = document.querySelector('#main-content');
+                if (mainContent) {
+                    evt.detail.target = '#main-content';
+                    console.log('使用默认目标: #main-content');
+                }
+            });
+            
+            // 注释掉错误日志监听器，避免控制台出现错误信息
+            // document.body.addEventListener('htmx:responseError', function(evt) {
+            //     console.error('HTMX响应错误:', evt.detail);
+            // });
+            
+            // document.body.addEventListener('htmx:sendError', function(evt) {
+            //     console.error('HTMX发送错误:', evt.detail);
+            // });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!-- 主页内容片段 -->
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-home me-2"></i>欢迎来到用户管理系统
+                </h4>
+            </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h5 class="text-muted">您已成功登录！</h5>
+                        <p class="lead">欢迎使用我们的系统，您可以在这里管理您的账户信息。</p>
+                    </div>
+                    
+                    <!-- 功能区域 -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="feature-box text-center p-3 border rounded">
+                                <i class="fas fa-user-cog fa-2x text-primary mb-2"></i>
+                                <h6>账户管理</h6>
+                                <p class="text-muted small">管理您的个人信息和账户设置</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-box text-center p-3 border rounded">
+                                <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                                <h6>安全设置</h6>
+                                <p class="text-muted small">保护您的账户安全</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a href="{% url 'change_password' %}" 
+                               class="btn btn-outline-primary w-100"
+                               hx-get="{% url 'change_password' %}" 
+                               hx-target="#main-content" 
+                               hx-swap="innerHTML" 
+                               hx-push-url="true">
+                                <i class="fas fa-key me-2"></i>修改密码
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'logout' %}" 
+                               class="btn btn-outline-danger w-100"
+                               onclick="return confirm('确定要退出登录吗？');">
+                                <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+<style>
+.feature-box {
+    transition: all 0.3s ease;
+    background-color: #f8f9fc;
+}
+
+.feature-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: white;
+}
+</style>
